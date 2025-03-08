@@ -18,6 +18,11 @@ chatgpt = ChatGPT()
 def home():
     return 'Hello, World!'
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # 204 = No Content
+
+
 @app.route("/webhook", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
