@@ -32,7 +32,7 @@ working_status = DEFAULT_TALKING
 
 @app.route('/')
 def home():
-    return 'Hello, World!'
+    return '✅ Line AI Bot is running!'
 
 @app.route('/favicon.ico')
 def favicon():
@@ -79,18 +79,22 @@ def handle_message(event):
     send_line_reply(event.reply_token, reply_text)
 
 def get_ai_response(user_message):
-    """取得 OpenAI GPT 回應"""
+    """使用新版 OpenAI API 取得 AI 回應"""
     try:
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI()  # 創建 OpenAI 客戶端
+        response = client.chat.completions.create(  # 使用新版 API 語法
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": user_message}]
         )
-        ai_reply = response["choices"][0]["message"]["content"].strip()
+        ai_reply = response.choices[0].message.content.strip()
         print(f"🤖 AI 回應: {ai_reply}")  # 記錄 AI 回應
         return ai_reply
-    except Exception as e:
+    except openai.OpenAIError as e:
         print(f"❌ OpenAI API 發生錯誤: {str(e)}")
-        return "抱歉，我暫時無法回答你的問題。"
+        return f"OpenAI API 錯誤: {str(e)}"
+    except Exception as e:
+        print(f"❌ 未知錯誤: {str(e)}")
+        return f"未知錯誤: {str(e)}"
 
 def send_line_reply(reply_token, text):
     """發送訊息到 LINE"""
